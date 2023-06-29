@@ -5,6 +5,10 @@ import { getDataSource } from "../typeorm";
 export class ClientRepository {
   public constructor(private readonly repository: Repository<Client>) {}
 
+  public async findAll(): Promise<Client[]> {
+    return await this.repository.find();
+  }
+
   public async save(model: Client): Promise<Client> {
     return await this.repository.save(model);
   }

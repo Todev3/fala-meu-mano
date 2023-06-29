@@ -31,6 +31,10 @@ const server = http.createServer(app);
 const io = new SocketServer(server);
 
 io.on("connection", async (socket: Socket) => {
+  const allClients = await clientRepository.findAll();
+
+  initOnlineClients(allClients, onlineClients);
+
   const clientName = socket.handshake.headers.id ?? "default";
   const socketId = socket.id;
 
@@ -90,8 +94,6 @@ io.on("connection", async (socket: Socket) => {
     console.log("Disconnect ->", socketId);
   });
 });
-
-initOnlineClients([], onlineClients);
 
 startConnection().catch((error: any) => {
   console.log("Error on start connection", error);
