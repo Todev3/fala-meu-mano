@@ -1,18 +1,25 @@
 import http from "http";
 import { Socket, Server as SocketServer } from "socket.io";
-import { IIncomeMessage } from "./interfaces";
-import { memoryMsg, onlineClients } from "./memoryDb";
+import { IIncomeMessage } from "./interface/interfaces";
+import { memoryMsg, onlineClients } from "./data/memoryDb";
 import {
   addMsgToBuffer,
-  connectClient,
   createOutcomeMessage,
-  disconnectClient,
   emitClientsEvent,
   emitEvent,
-  getOnlineClientsDTO,
+  emitEventBySocketId,
   sendMsgBuffer,
-} from "./utils";
+} from "./utils/messageUtil";
 import Express from "express";
+import { startConnection } from "./typeorm";
+import { clientRepository } from "./repository/ClientRepository";
+import { Client } from "./entity/Client";
+import {
+  connectClient,
+  disconnectClient,
+  getOnlineClientsDTO,
+  initOnlineClients,
+} from "./utils/onlineClientUtil";
 
 export const app = Express();
 
@@ -34,17 +41,34 @@ io.on("connection", async (socket: Socket) => {
     return;
   }
 
-  const onlineClient = connectClient(clientName, socketId, onlineClients);
+  let client = await clientRepository.findByName(clientName);
+
+  if (!client) {
+    client = new Client();
+    client.name = clientName;
+    client = await clientRepository.save(client);
+  }
+
+  const onlineClient = connectClient(client, socketId, onlineClients);
 
   emitClientsEvent(io, getOnlineClientsDTO([...onlineClients]));
 
   sendMsgBuffer(io, onlineClient, memoryMsg);
 
-  socket.on("message", (data: string) => {
+  socket.on("message", async (data: string) => {
     try {
       const { receiver, msg } = JSON.parse(data) as IIncomeMessage;
 
       const out = createOutcomeMessage(clientName, msg);
+
+      const client = await clientRepository.findByName(receiver);
+
+      if (!client) {
+        emitEventBySocketId<string>(io, socketId, "error", [
+          `Client ${receiver} not found`,
+        ]);
+        return;
+      }
 
       const onlineReceiver = onlineClients.get(receiver);
 
@@ -59,12 +83,18 @@ io.on("connection", async (socket: Socket) => {
   });
 
   socket.on("disconnect", () => {
-    disconnectClient(clientName, onlineClients);
+    if (client) disconnectClient(client, onlineClients);
 
     emitEvent(io, "clients", getOnlineClientsDTO([...onlineClients]));
 
     console.log("Disconnect ->", socketId);
   });
+});
+
+initOnlineClients([], onlineClients);
+
+startConnection().catch((error: any) => {
+  console.log("Error on start connection", error);
 });
 
 server.listen(3000, () => {

@@ -17,8 +17,9 @@ export interface IOnlineClientDTO {
 }
 
 export interface IOnlineClient {
-  id: string;
+  id: number;
+  name: string;
   online: boolean;
-  lastLogin: Date;
+  lastLogin: Date | null;
   socketId: string;
 }

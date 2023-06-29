@@ -1,25 +1,16 @@
 import { Server } from "socket.io";
-import { IOnlineClient, IOnlineClientDTO, IOutcomeMessage } from "./interfaces";
-
-export const getOnlineClientsDTO = (
-  onlineClients: any[]
-): IOnlineClientDTO[] => {
-  return onlineClients.map(([key, value]) => {
-    return {
-      name: key,
-      online: value.online,
-      lastLogin: value.lastLogin,
-      socketId: "",
-    };
-  });
-};
+import {
+  IOnlineClient,
+  IOnlineClientDTO,
+  IOutcomeMessage,
+} from "../interface/interfaces";
 
 export const sendMsgBuffer = (
   io: Server,
   client: IOnlineClient,
   memoryMsg: Map<string, IOutcomeMessage[]>
 ): boolean => {
-  const msgBuffer = memoryMsg.get(client.id) ?? [];
+  const msgBuffer = memoryMsg.get(client.name) ?? [];
   const size = msgBuffer.length;
 
   if (size) {
@@ -56,34 +47,6 @@ export const emitEventBySocketId = <T>(
 
 export const emitEvent = <T>(io: Server, event: string, data: T[]): void => {
   io.emit(event, data);
-};
-
-export const disconnectClient = (
-  clientName: string,
-  onlineClients: Map<string, any>
-): void => {
-  const client = onlineClients.get(clientName);
-
-  client.online = false;
-  client.lastDate = new Date();
-  client.socketId = null;
-};
-
-export const connectClient = (
-  clientName: string,
-  socketId: string,
-  onlineClients: Map<string, IOnlineClient>
-): IOnlineClient => {
-  const client: IOnlineClient = {
-    id: clientName,
-    socketId,
-    lastLogin: new Date(),
-    online: true,
-  };
-
-  onlineClients.set(clientName, client);
-
-  return client;
 };
 
 export const createOutcomeMessage = (

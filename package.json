@@ -34,6 +34,9 @@
     "date-fns": "^2.30.0",
     "dotenv": "^16.1.4",
     "express": "^4.18.2",
-    "socket.io": "^4.7.0"
+    "reflect-metadata": "^0.1.13",
+    "socket.io": "^4.7.0",
+    "sqlite3": "^5.1.6",
+    "typeorm": "^0.3.17"
   }
 }

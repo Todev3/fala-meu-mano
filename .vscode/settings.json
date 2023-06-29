@@ -30,4 +30,13 @@
       "typeorm",
       "versao"
     ],
+    "sqltools.connections": [
+      {
+        "previewLimit": 50,
+        "driver": "SQLite",
+        "name": "Frank-lindo",
+        "database": "${workspaceFolder:fala-meu-mano}/database/db.sqlite"
+      }
+    ],
+    "sqltools.useNodeRuntime": true,
 }
