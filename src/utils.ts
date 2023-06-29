@@ -16,16 +16,15 @@ export const getOnlineClientsDTO = (
 
 export const sendMsgBuffer = (
   io: Server,
-  clientName: string,
-  socketId: string,
+  client: IOnlineClient,
   memoryMsg: Map<string, IOutcomeMessage[]>
 ): boolean => {
-  const msgBuffer = memoryMsg.get(clientName) ?? [];
+  const msgBuffer = memoryMsg.get(client.id) ?? [];
   const size = msgBuffer.length;
 
   if (size) {
     const sendMsgs = msgBuffer.splice(0, size);
-    emitMsgEventBySocketId(io, socketId, sendMsgs);
+    emitMsgEventBySocketId(io, client.socketId, sendMsgs);
   }
 
   return !!size;
@@ -74,12 +73,17 @@ export const connectClient = (
   clientName: string,
   socketId: string,
   onlineClients: Map<string, IOnlineClient>
-): void => {
-  onlineClients.set(clientName, {
+): IOnlineClient => {
+  const client: IOnlineClient = {
+    id: clientName,
     socketId,
     lastLogin: new Date(),
     online: true,
-  });
+  };
+
+  onlineClients.set(clientName, client);
+
+  return client;
 };
 
 export const createOutcomeMessage = (

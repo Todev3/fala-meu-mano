@@ -34,11 +34,11 @@ io.on("connection", async (socket: Socket) => {
     return;
   }
 
-  connectClient(clientName, socketId, onlineClients);
+  const onlineClient = connectClient(clientName, socketId, onlineClients);
 
   emitClientsEvent(io, getOnlineClientsDTO([...onlineClients]));
 
-  sendMsgBuffer(io, clientName, socketId, memoryMsg);
+  sendMsgBuffer(io, onlineClient, memoryMsg);
 
   socket.on("message", (data: string) => {
     try {
@@ -51,7 +51,7 @@ io.on("connection", async (socket: Socket) => {
       addMsgToBuffer(receiver, out, memoryMsg);
 
       if (onlineReceiver?.online) {
-        sendMsgBuffer(io, clientName, socketId, memoryMsg);
+        sendMsgBuffer(io, onlineReceiver, memoryMsg);
       }
     } catch (error) {
       console.log("error", error);
