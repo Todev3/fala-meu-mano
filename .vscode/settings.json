@@ -1,0 +1,33 @@
+{
+    "eslint.validate": ["typescript"],
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    },
+    "cSpell.words": [
+      "autor",
+      "Calendario",
+      "CNPJ",
+      "CONSDECLARACAO",
+      "CONSEXTRATO",
+      "Consolidacao",
+      "consultar",
+      "contratante",
+      "contribuinte",
+      "GERARDAS",
+      "isvalid",
+      "numero",
+      "OBTERPROCURACAO",
+      "outorgado",
+      "outorgante",
+      "Pedido",
+      "pgdasd",
+      "PGMEI",
+      "PROCURACOES",
+      "serpro",
+      "Servico",
+      "tipo",
+      "TRIBUTA",
+      "typeorm",
+      "versao"
+    ],
+}
