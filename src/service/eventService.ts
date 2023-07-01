@@ -1,24 +1,21 @@
 import { Server } from "socket.io";
-import {
-  IOnlineUser,
-  IOnlineUserDTO,
-  IOutcomeMessage,
-} from "../interface/interfaces";
+import { IOutcomeMessage } from "../interface/interfaces";
+import { IOnlineUser, IOnlineUserDTO } from "../interface/OnlineUserInterface";
 
 export const sendMsgBuffer = (
   io: Server,
   user: IOnlineUser,
   memoryMsg: Map<string, IOutcomeMessage[]>
 ): boolean => {
-  const msgBuffer = memoryMsg.get(user.name) ?? [];
-  const size = msgBuffer.length;
+  const msgBuffer = memoryMsg.get(user.name);
+  const size = msgBuffer?.length;
 
-  if (size) {
-    const sendMsgs = msgBuffer.splice(0, size);
-    emitMsgEventBySocketId(io, user.socketId, sendMsgs);
-  }
+  if (!user.online || !size) return false;
 
-  return !!size;
+  const sendMsgs = msgBuffer.splice(0, size);
+  emitMsgEventBySocketId(io, user.socketId, sendMsgs);
+
+  return true;
 };
 
 export const emitMsgEventBySocketId = (

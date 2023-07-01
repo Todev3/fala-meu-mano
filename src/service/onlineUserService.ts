@@ -1,9 +1,10 @@
 import { UserEntity } from "../entity/UserEntity";
-import { IOnlineUser, IOnlineUserDTO } from "../interface/interfaces";
+import { IOnlineUser, IOnlineUserDTO } from "../interface/OnlineUserInterface";
+import { SessionDb } from "../interface/SessionDb";
 
 export const initOnlineUsers = (
   users: UserEntity[],
-  onlineUsers: Map<string, IOnlineUser>
+  onlineUsers: SessionDb
 ): void => {
   users.forEach((user) => {
     onlineUsers.set(user.name, {
@@ -18,19 +19,21 @@ export const initOnlineUsers = (
 
 export const disconnectUser = (
   user: UserEntity,
-  onlineUsers: Map<string, any>
+  onlineUsers: SessionDb
 ): void => {
   const onlineUser = onlineUsers.get(user.name);
 
+  if (!onlineUser) return;
+
   onlineUser.online = false;
-  onlineUser.lastDate = new Date();
-  onlineUser.socketId = null;
+  onlineUser.lastLogin = new Date();
+  onlineUser.socketId = "";
 };
 
 export const connectUser = (
   user: UserEntity,
   socketId: string,
-  onlineUsers: Map<string, IOnlineUser>
+  onlineUsers: SessionDb
 ): IOnlineUser => {
   const onlineUser: IOnlineUser = {
     id: user.id,
@@ -45,7 +48,9 @@ export const connectUser = (
   return onlineUser;
 };
 
-export const getOnlineUsersDTO = (onlineUser: any[]): IOnlineUserDTO[] => {
+export const getOnlineUsersDTO = (
+  onlineUser: Array<[string, IOnlineUser]>
+): IOnlineUserDTO[] => {
   return onlineUser.map(([key, value]) => {
     return {
       name: key,

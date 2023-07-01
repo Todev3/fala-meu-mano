@@ -1,12 +1,12 @@
 import http from "http";
 import { Socket, Server as SocketServer } from "socket.io";
 import { IIncomeMessage } from "./interface/interfaces";
-import { memoryMsg, onlineUsers } from "./data/memoryDb";
+import { memoryMsg } from "./data/memoryDb";
+import { sessionMemoryDb as onlineUsers } from "./data/SessionMemoryDb";
 import {
   addMsgToBuffer,
   createOutcomeMessage,
   emitUsersEvent,
-  emitEvent,
   sendMsgBuffer,
   emitErrorEventBySocketId,
 } from "./service/eventService";
@@ -38,17 +38,19 @@ io.on("connection", async (socket: Socket) => {
 
   console.log("Connect id ->", socketId, userName);
 
-  if (!userName || Array.isArray(userName)) {
-    console.log("id is not valid ->", userName);
+  if (Array.isArray(userName)) {
+    emitErrorEventBySocketId(
+      io,
+      socketId,
+      `id is not valid -> ${JSON.stringify(userName)}`
+    );
     return;
   }
 
   const user = await getOrCreateUser(userName, userRepository);
-
   const onlineUser = connectUser(user, socketId, onlineUsers);
 
-  emitUsersEvent(io, getOnlineUsersDTO([...onlineUsers]));
-
+  emitUsersEvent(io, getOnlineUsersDTO(onlineUsers.toArray()));
   sendMsgBuffer(io, onlineUser, memoryMsg);
 
   socket.on("message", async (data: string) => {
@@ -63,16 +65,12 @@ io.on("connection", async (socket: Socket) => {
       }
 
       const message = createMessage(user.id, onlineReceiver.id, msg);
+      const out = createOutcomeMessage(user.name, msg, message.dtRecieved);
 
       await persistMessage(message, messageRepository);
 
-      const out = createOutcomeMessage(user.name, msg, message.dtRecieved);
-
       addMsgToBuffer(receiver, out, memoryMsg);
-
-      if (onlineReceiver.online) {
-        sendMsgBuffer(io, onlineReceiver, memoryMsg);
-      }
+      sendMsgBuffer(io, onlineReceiver, memoryMsg);
     } catch (error: any) {
       emitErrorEventBySocketId(io, socketId, error.message);
     }
@@ -81,7 +79,7 @@ io.on("connection", async (socket: Socket) => {
   socket.on("disconnect", () => {
     disconnectUser(user, onlineUsers);
 
-    emitEvent(io, "users", getOnlineUsersDTO([...onlineUsers]));
+    emitUsersEvent(io, getOnlineUsersDTO(onlineUsers.toArray()));
 
     console.log("Disconnect ->", socketId);
   });
