@@ -24,7 +24,7 @@ message (evento defualt socket.io): utilizado para enviar mensagens para o um us
         msg: string
     }
 
-clients: utilizado para receber a lista de usuarios conectados no sistema
+users: utilizado para receber a lista de usuarios conectados no sistema
 
     { 
         name: string, 

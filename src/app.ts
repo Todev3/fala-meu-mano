@@ -32,19 +32,19 @@ const server = http.createServer(app);
 const io = new SocketServer(server);
 
 io.on("connection", async (socket: Socket) => {
-  const clientName = socket.handshake.headers.id ?? "default";
+  const userName = socket.handshake.headers.id ?? "default";
   const socketId = socket.id;
 
-  console.log("Connect id ->", socketId, clientName);
+  console.log("Connect id ->", socketId, userName);
 
-  if (!clientName || Array.isArray(clientName)) {
-    console.log("id is not valid ->", clientName);
+  if (!userName || Array.isArray(userName)) {
+    console.log("id is not valid ->", userName);
     return;
   }
 
-  const client = await getOrCreateUser(clientName, userRepository);
+  const user = await getOrCreateUser(userName, userRepository);
 
-  const onlineUser = connectUser(client, socketId, onlineUsers);
+  const onlineUser = connectUser(user, socketId, onlineUsers);
 
   emitUsersEvent(io, getOnlineUsersDTO([...onlineUsers]));
 
@@ -54,7 +54,7 @@ io.on("connection", async (socket: Socket) => {
     try {
       const { receiver, msg } = JSON.parse(data) as IIncomeMessage;
 
-      const out = createOutcomeMessage(clientName, msg);
+      const out = createOutcomeMessage(userName, msg);
 
       const receiverUser = await userRepository.findByName(receiver);
       const onlineReceiver = onlineUsers.get(receiver);
@@ -69,7 +69,7 @@ io.on("connection", async (socket: Socket) => {
       const message = new Message();
 
       message.receiver = onlineReceiver.id;
-      message.sender = client.id;
+      message.sender = user.id;
       message.data = msg;
       message.dtRecieved = new Date();
 
@@ -84,9 +84,9 @@ io.on("connection", async (socket: Socket) => {
   });
 
   socket.on("disconnect", () => {
-    if (client) disconnectUser(client, onlineUsers);
+    if (user) disconnectUser(user, onlineUsers);
 
-    emitEvent(io, "clients", getOnlineUsersDTO([...onlineUsers]));
+    emitEvent(io, "users", getOnlineUsersDTO([...onlineUsers]));
 
     console.log("Disconnect ->", socketId);
   });
