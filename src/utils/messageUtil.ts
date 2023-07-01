@@ -7,15 +7,15 @@ import {
 
 export const sendMsgBuffer = (
   io: Server,
-  client: IOnlineUser,
+  user: IOnlineUser,
   memoryMsg: Map<string, IOutcomeMessage[]>
 ): boolean => {
-  const msgBuffer = memoryMsg.get(client.name) ?? [];
+  const msgBuffer = memoryMsg.get(user.name) ?? [];
   const size = msgBuffer.length;
 
   if (size) {
     const sendMsgs = msgBuffer.splice(0, size);
-    emitMsgEventBySocketId(io, client.socketId, sendMsgs);
+    emitMsgEventBySocketId(io, user.socketId, sendMsgs);
   }
 
   return !!size;
@@ -30,7 +30,7 @@ export const emitMsgEventBySocketId = (
 };
 
 export const emitUsersEvent = (io: Server, users: IOnlineUserDTO[]): void => {
-  emitEvent<IOnlineUserDTO>(io, "clients", users);
+  emitEvent<IOnlineUserDTO>(io, "users", users);
 };
 
 export const emitEventBySocketId = <T>(

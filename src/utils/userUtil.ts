@@ -2,16 +2,16 @@ import { User } from "../entity/User";
 import { UserRepository } from "../repository/UserRepository";
 
 export const getOrCreateUser = async (
-  clientName: string,
+  userName: string,
   repository: UserRepository
 ): Promise<User> => {
-  const client = await repository.findByName(clientName);
+  const user = await repository.findByName(userName);
 
-  if (!client) {
+  if (!user) {
     const model = new User();
-    model.name = clientName;
+    model.name = userName;
     return await repository.save(model);
   }
 
-  return client;
+  return user;
 };
