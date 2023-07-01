@@ -1,25 +1,26 @@
 import http from "http";
 import { Socket, Server as SocketServer } from "socket.io";
 import { IIncomeMessage } from "./interface/interfaces";
-import { memoryMsg, onlineClients } from "./data/memoryDb";
+import { memoryMsg, onlineUsers } from "./data/memoryDb";
 import {
   addMsgToBuffer,
   createOutcomeMessage,
-  emitClientsEvent,
+  emitUsersEvent,
   emitEvent,
   emitEventBySocketId,
   sendMsgBuffer,
 } from "./utils/messageUtil";
 import Express from "express";
 import { startConnection } from "./typeorm";
-import { clientRepository } from "./repository/ClientRepository";
-import { Client } from "./entity/Client";
+import { userRepository } from "./repository/UserRepository";
 import {
-  connectClient,
-  disconnectClient,
-  getOnlineClientsDTO,
-  initOnlineClients,
-} from "./utils/onlineClientUtil";
+  connectUser,
+  disconnectUser,
+  getOnlineUsersDTO,
+  initOnlineUsers,
+} from "./utils/onlineUserUtil";
+import { Message } from "./entity/Message";
+import { getOrCreateUser } from "./utils/userUtil";
 
 export const app = Express();
 
@@ -31,10 +32,6 @@ const server = http.createServer(app);
 const io = new SocketServer(server);
 
 io.on("connection", async (socket: Socket) => {
-  const allClients = await clientRepository.findAll();
-
-  initOnlineClients(allClients, onlineClients);
-
   const clientName = socket.handshake.headers.id ?? "default";
   const socketId = socket.id;
 
@@ -45,19 +42,13 @@ io.on("connection", async (socket: Socket) => {
     return;
   }
 
-  let client = await clientRepository.findByName(clientName);
+  const client = await getOrCreateUser(clientName, userRepository);
 
-  if (!client) {
-    client = new Client();
-    client.name = clientName;
-    client = await clientRepository.save(client);
-  }
+  const onlineUser = connectUser(client, socketId, onlineUsers);
 
-  const onlineClient = connectClient(client, socketId, onlineClients);
+  emitUsersEvent(io, getOnlineUsersDTO([...onlineUsers]));
 
-  emitClientsEvent(io, getOnlineClientsDTO([...onlineClients]));
-
-  sendMsgBuffer(io, onlineClient, memoryMsg);
+  sendMsgBuffer(io, onlineUser, memoryMsg);
 
   socket.on("message", async (data: string) => {
     try {
@@ -65,20 +56,26 @@ io.on("connection", async (socket: Socket) => {
 
       const out = createOutcomeMessage(clientName, msg);
 
-      const client = await clientRepository.findByName(receiver);
+      const receiverUser = await userRepository.findByName(receiver);
+      const onlineReceiver = onlineUsers.get(receiver);
 
-      if (!client) {
+      if (!receiverUser || !onlineReceiver) {
         emitEventBySocketId<string>(io, socketId, "error", [
-          `Client ${receiver} not found`,
+          `User ${receiver} not found`,
         ]);
         return;
       }
 
-      const onlineReceiver = onlineClients.get(receiver);
+      const message = new Message();
+
+      message.receiver = onlineReceiver.id;
+      message.sender = client.id;
+      message.data = msg;
+      message.dtRecieved = new Date();
 
       addMsgToBuffer(receiver, out, memoryMsg);
 
-      if (onlineReceiver?.online) {
+      if (onlineReceiver.online) {
         sendMsgBuffer(io, onlineReceiver, memoryMsg);
       }
     } catch (error) {
@@ -87,18 +84,27 @@ io.on("connection", async (socket: Socket) => {
   });
 
   socket.on("disconnect", () => {
-    if (client) disconnectClient(client, onlineClients);
+    if (client) disconnectUser(client, onlineUsers);
 
-    emitEvent(io, "clients", getOnlineClientsDTO([...onlineClients]));
+    emitEvent(io, "clients", getOnlineUsersDTO([...onlineUsers]));
 
     console.log("Disconnect ->", socketId);
   });
 });
 
-startConnection().catch((error: any) => {
-  console.log("Error on start connection", error);
-});
+startConnection()
+  .then(async () => {
+    console.log("Database connected");
 
-server.listen(3000, () => {
+    const allUsers = await userRepository.findAll();
+    initOnlineUsers(allUsers, onlineUsers);
+
+    return null;
+  })
+  .catch((error: any) => {
+    console.log("Error on start connection", error);
+  });
+
+server.listen(3000, "0.0.0.0", () => {
   console.log("listening on -> 3000");
 });

@@ -1,13 +1,13 @@
 import { Server } from "socket.io";
 import {
-  IOnlineClient,
-  IOnlineClientDTO,
+  IOnlineUser,
+  IOnlineUserDTO,
   IOutcomeMessage,
 } from "../interface/interfaces";
 
 export const sendMsgBuffer = (
   io: Server,
-  client: IOnlineClient,
+  client: IOnlineUser,
   memoryMsg: Map<string, IOutcomeMessage[]>
 ): boolean => {
   const msgBuffer = memoryMsg.get(client.name) ?? [];
@@ -29,11 +29,8 @@ export const emitMsgEventBySocketId = (
   emitEventBySocketId<IOutcomeMessage>(io, socketId, "msg", msgs);
 };
 
-export const emitClientsEvent = (
-  io: Server,
-  clients: IOnlineClientDTO[]
-): void => {
-  emitEvent<IOnlineClientDTO>(io, "clients", clients);
+export const emitUsersEvent = (io: Server, users: IOnlineUserDTO[]): void => {
+  emitEvent<IOnlineUserDTO>(io, "clients", users);
 };
 
 export const emitEventBySocketId = <T>(

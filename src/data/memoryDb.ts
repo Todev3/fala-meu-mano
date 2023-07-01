@@ -1,4 +1,4 @@
-import { IOnlineClient, IOutcomeMessage } from "../interface/interfaces";
+import { IOnlineUser, IOutcomeMessage } from "../interface/interfaces";
 
-export const onlineClients = new Map<string, IOnlineClient>();
+export const onlineUsers = new Map<string, IOnlineUser>();
 export const memoryMsg = new Map<string, IOutcomeMessage[]>();

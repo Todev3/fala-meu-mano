@@ -9,14 +9,14 @@ export interface IOutcomeMessage {
   date: Date;
 }
 
-export interface IOnlineClientDTO {
+export interface IOnlineUserDTO {
   name: string;
   online: boolean;
   lastLogin: Date;
   socketId: string;
 }
 
-export interface IOnlineClient {
+export interface IOnlineUser {
   id: number;
   name: string;
   online: boolean;

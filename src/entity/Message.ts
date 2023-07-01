@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Client } from "./Client";
+import { User } from "./User";
 
 @Entity("message")
 export class Message {
@@ -16,12 +16,12 @@ export class Message {
   data: string;
 
   @Column()
-  @ManyToOne(() => Client)
+  @ManyToOne(() => User)
   @JoinColumn({ name: "receiver" })
   receiver: number;
 
   @Column()
-  @ManyToOne(() => Client)
+  @ManyToOne(() => User)
   @JoinColumn({ name: "sender" })
   sender: number;
 
