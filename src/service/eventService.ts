@@ -29,6 +29,14 @@ export const emitMsgEventBySocketId = (
   emitEventBySocketId<IOutcomeMessage>(io, socketId, "msg", msgs);
 };
 
+export const emitErrorEventBySocketId = (
+  io: Server,
+  socketId: string,
+  erro: string
+): void => {
+  emitEventBySocketId<string>(io, socketId, "error", [erro]);
+};
+
 export const emitUsersEvent = (io: Server, users: IOnlineUserDTO[]): void => {
   emitEvent<IOnlineUserDTO>(io, "users", users);
 };
@@ -48,12 +56,13 @@ export const emitEvent = <T>(io: Server, event: string, data: T[]): void => {
 
 export const createOutcomeMessage = (
   sender: string,
-  msg: string
+  msg: string,
+  date: Date
 ): IOutcomeMessage => {
   return {
     sender,
     msg,
-    date: new Date(),
+    date,
   };
 };
 
@@ -62,5 +71,7 @@ export const addMsgToBuffer = (
   out: IOutcomeMessage,
   memoryMsg: Map<string, IOutcomeMessage[]>
 ): void => {
-  memoryMsg.get(receiver)?.push(out) ?? memoryMsg.set(receiver, []);
+  const buffer = memoryMsg.get(receiver) ?? [];
+
+  memoryMsg.set(receiver, [...buffer, out]);
 };

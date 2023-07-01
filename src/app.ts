@@ -7,9 +7,9 @@ import {
   createOutcomeMessage,
   emitUsersEvent,
   emitEvent,
-  emitEventBySocketId,
   sendMsgBuffer,
-} from "./utils/messageUtil";
+  emitErrorEventBySocketId,
+} from "./service/eventService";
 import Express from "express";
 import { startConnection } from "./typeorm";
 import { userRepository } from "./repository/UserRepository";
@@ -18,9 +18,10 @@ import {
   disconnectUser,
   getOnlineUsersDTO,
   initOnlineUsers,
-} from "./utils/onlineUserUtil";
-import { Message } from "./entity/Message";
-import { getOrCreateUser } from "./utils/userUtil";
+} from "./service/onlineUserService";
+import { getOrCreateUser } from "./service/userService";
+import { messageRepository } from "./repository/MessageRepository";
+import { createMessage, persistMessage } from "./service/messageService";
 
 export const app = Express();
 
@@ -54,37 +55,31 @@ io.on("connection", async (socket: Socket) => {
     try {
       const { receiver, msg } = JSON.parse(data) as IIncomeMessage;
 
-      const out = createOutcomeMessage(userName, msg);
-
-      const receiverUser = await userRepository.findByName(receiver);
       const onlineReceiver = onlineUsers.get(receiver);
 
-      if (!receiverUser || !onlineReceiver) {
-        emitEventBySocketId<string>(io, socketId, "error", [
-          `User ${receiver} not found`,
-        ]);
+      if (!onlineReceiver) {
+        emitErrorEventBySocketId(io, socketId, `User ${receiver} not found`);
         return;
       }
 
-      const message = new Message();
+      const message = createMessage(user.id, onlineReceiver.id, msg);
 
-      message.receiver = onlineReceiver.id;
-      message.sender = user.id;
-      message.data = msg;
-      message.dtRecieved = new Date();
+      await persistMessage(message, messageRepository);
+
+      const out = createOutcomeMessage(user.name, msg, message.dtRecieved);
 
       addMsgToBuffer(receiver, out, memoryMsg);
 
       if (onlineReceiver.online) {
         sendMsgBuffer(io, onlineReceiver, memoryMsg);
       }
-    } catch (error) {
-      console.log("error", error);
+    } catch (error: any) {
+      emitErrorEventBySocketId(io, socketId, error.message);
     }
   });
 
   socket.on("disconnect", () => {
-    if (user) disconnectUser(user, onlineUsers);
+    disconnectUser(user, onlineUsers);
 
     emitEvent(io, "users", getOnlineUsersDTO([...onlineUsers]));
 

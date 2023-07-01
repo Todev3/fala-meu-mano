@@ -1,23 +1,23 @@
 import { Repository } from "typeorm";
-import { User } from "../entity/User";
+import { UserEntity } from "../entity/UserEntity";
 import { getDataSource } from "../typeorm";
 
 export class UserRepository {
-  public constructor(private readonly repository: Repository<User>) {}
+  public constructor(private readonly repository: Repository<UserEntity>) {}
 
-  public async findAll(): Promise<User[]> {
+  public async findAll(): Promise<UserEntity[]> {
     return await this.repository.find();
   }
 
-  public async save(model: User): Promise<User> {
+  public async save(model: UserEntity): Promise<UserEntity> {
     return await this.repository.save(model);
   }
 
-  public async findByName(name: string): Promise<User | null> {
+  public async findByName(name: string): Promise<UserEntity | null> {
     return await this.repository.findOne({ where: { name } });
   }
 }
 
 export const userRepository = new UserRepository(
-  getDataSource().getRepository(User)
+  getDataSource().getRepository(UserEntity)
 );

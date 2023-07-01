@@ -1,8 +1,8 @@
-import { User } from "../entity/User";
+import { UserEntity } from "../entity/UserEntity";
 import { IOnlineUser, IOnlineUserDTO } from "../interface/interfaces";
 
 export const initOnlineUsers = (
-  users: User[],
+  users: UserEntity[],
   onlineUsers: Map<string, IOnlineUser>
 ): void => {
   users.forEach((user) => {
@@ -17,7 +17,7 @@ export const initOnlineUsers = (
 };
 
 export const disconnectUser = (
-  user: User,
+  user: UserEntity,
   onlineUsers: Map<string, any>
 ): void => {
   const onlineUser = onlineUsers.get(user.name);
@@ -28,7 +28,7 @@ export const disconnectUser = (
 };
 
 export const connectUser = (
-  user: User,
+  user: UserEntity,
   socketId: string,
   onlineUsers: Map<string, IOnlineUser>
 ): IOnlineUser => {
