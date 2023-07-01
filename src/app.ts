@@ -24,10 +24,7 @@ import { messageRepository } from "./repository/MessageRepository";
 import { createMessage, persistMessage } from "./service/messageService";
 
 export const app = Express();
-
-app.get("/", (_, res) => {
-  res.send("Hello World!");
-});
+app.use(Express.static('public'));
 
 const server = http.createServer(app);
 const io = new SocketServer(server);

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pr-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./styles/global.css">
+    <title>ChatGPT</title>
+</head>
+
+<body>
+
+    <main>
+        <button id="btn-sidebar"
+            class="inline-flex items-center p-2 mt-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden">
+            <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg">
+                <path clip-rule="evenodd" fill-rule="evenodd"
+                    d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z">
+                </path>
+            </svg>
+        </button>
+
+        <aside id="sidebar"
+            class="fixed top-0 left-0 z-40 w-80 h-screen transition-transform -translate-x-full md:translate-x-0 bg-zinc-900">
+            <div class="h-full px-3 py-4 overflow-y-scroll scroll-hidden">
+                <ul id="users" class="space-y-2">
+                    
+                </ul>
+            </div>
+        </aside>
+
+        <main id="main" class="relative p-4 md:ml-80">
+            <section id="main-section" class="relative flex flex-col w-full">
+
+                <div id="messages" class="flex flex-col pb-48">
+                    
+                </div>
+
+                <div class="block fixed left-0 bottom-0 right-0 transition-all">
+                    <div class="md:pl-80 window-bottom-shadow py-10 flex items-center justify-center">
+                        <div class="w-full max-w-3xl mx-auto z-30 px-4">
+                            <div class="w-full h-16 bg-gray-900 rounded-md pr-2 flex items-center justify-center gap-4">
+                                <input id="inMessage" class="w-full h-full outline-none pl-4 bg-transparent" type="text"
+                                    placeholder="Enviar mensagem">
+                                <button id="btnMessage"
+                                    class="w-12 h-12 flex items-center justify-center outline-none border-none cursor-pointer select-none rounded-md bg-violet-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"
+                                        class="h-4 w-4 m-1 md:m-0" stroke-width="2">
+                                        <path
+                                            d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
+                                            fill="currentColor"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./scripts/chat.js"></script>
+</body>
+
+</html>

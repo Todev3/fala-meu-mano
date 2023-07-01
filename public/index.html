@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./styles/global.css">
+    <title>ChatGPT</title>
+</head>
+
+<body>
+    <main class="w-full min-h-screen flex flex-col items-center justify-center space-y-8 px-6">
+        <div class="text-center">
+            <h1 class="text-xl font-medium">Bem vindo ao ChatGPT</h1>
+            <p class="text-sm text-gray-400">Chat Global Para Todelovers</p>
+        </div>
+        <form method="get" action="/chat.html" class="w-full max-w-lg space-y-2">
+            <div>
+                <label for="username" class="block mb-2 text-sm font-medium text-gray-300">Usuario</label>
+                <input id="username" name="username" type="text" class="bg-transparent border border-gray-400 outline-none text-white text-gray-900 text-sm rounded-md block w-full p-4" placeholder="John" required>
+            </div>
+            <button type="submit" class="bg-purple-600 outline-none uppercase font-medium text-white text-gray-900 text-sm rounded-md block w-full p-4">
+                Entrar
+            </button>
+        </form>
+    </main>
+</body>
+
+</html>
