@@ -1,6 +1,10 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-undef */
 const url = new URLSearchParams(window.location.search);
-const { username, receiver } = Object.fromEntries(url.entries());
+const params = Object.fromEntries(url.entries());
+
+const receiver = Number(params.receiver);
+const username = params.username;
 
 if (!username) {
   window.alert("Sério todelover? cadê seu nome? preencha e volte!");
@@ -43,12 +47,12 @@ if (receiver) {
     const { value } = inputMessage;
     if (value.trim() !== "") {
       const data = JSON.stringify({
-        receiver,
+        receiverId: receiver,
         msg: value,
       });
 
       socket.emit("message", data);
-      setMessageHTML(username, value);
+      setMessageHTML(username, value, new Date());
 
       inputMessage.value = "";
       return;
@@ -66,17 +70,24 @@ if (receiver) {
 // methods (on)
 socket.on("msg", (data) => {
   notifyMessage(data);
-  data.forEach(({ sender, msg }) => {
-    if (sender === receiver) {
-      setMessageHTML(sender, msg);
+  data.forEach(({ senderId, msg, date }) => {
+    if (senderId === receiver) {
+      setMessageHTML(senderId, msg, date);
     }
   });
 });
 
 socket.on("users", (data) => {
   divUsers.innerHTML = "";
-  const otherUsers = data.filter((user) => user.name !== username) ?? [];
-  otherUsers.forEach(({ name, online }) => setButtonLinkUser(name, online));
+  data.forEach(({ id, name, online }) =>{
+    if (name === username) {
+      localStorage.setItem('userid', id);
+      return;
+    }
+
+    setButtonLinkUser(id, name, online);
+  });
+
 });
 
 // UTILS
@@ -87,7 +98,7 @@ function notifyMessage(data = []) {
   const soundNotify = new Audio("../assets/notify.mp3");
 
   data.forEach((msg) => {
-    const btnUser = document.querySelector(`[data-user="${msg.sender}"]`);
+    const btnUser = document.querySelector(`[data-userid="${msg.senderId}"]`);
     const existsNotification = Number(btnUser.getAttribute("data-notify")) ?? 0;
 
     notification =
@@ -95,7 +106,7 @@ function notifyMessage(data = []) {
         ? "+9"
         : data.length + existsNotification;
 
-    if (msg.sender !== receiver) {
+    if (msg.senderId !== receiver) {
       btnUser.setAttribute("data-notify", notification);
     }
 
@@ -109,14 +120,23 @@ function notifyMessage(data = []) {
   });
 }
 
-function setMessageHTML(sender, msg) {
+function formatDate(date) {
+  const formatter = Intl.DateTimeFormat("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  return formatter.format(new Date(date));
+}
+
+function setMessageHTML(senderId, msg, date) {
   const element = document.createElement("div");
-  const isSender = sender === username;
+  const isSender = senderId !== receiver;
 
   element.innerHTML = /* html */ `
     <div class="message ${isSender ? "right" : "left"}">
-        <span> ${isSender ? "Você" : sender} </span>
         <p>${msg}</p>
+        <time>${formatDate(date)}</time>
     </div>
     `;
 
@@ -124,14 +144,16 @@ function setMessageHTML(sender, msg) {
   window.scrollTo(0, mainSection.scrollHeight);
 }
 
-function setButtonLinkUser(name, online) {
+function setButtonLinkUser(id, name, online) {
   const element = document.createElement("li");
   const { pathname } = window.location;
+
   element.innerHTML = /* html */ `
     <a
-        href="${pathname}?username=${username}&receiver=${name}"
-        data-user="${name}"
-        class="flex items-center gap-4 p-4 text-sm text-gray-400 rounded-lg hover:bg-zinc-800 hover:text-white">
+        href="${pathname}?username=${username}&receiver=${id}"
+        data-userid="${id}"
+        data-active="${id === receiver}"
+        class="transition-all flex items-center gap-4 p-4 text-sm text-gray-400 rounded-lg hover:bg-zinc-800 hover:text-white">
         <svg 
           stroke="${online ? "#4f7" : "#f47"}" 
           fill="none" stroke-width="2" viewBox="0 0 24 24"
