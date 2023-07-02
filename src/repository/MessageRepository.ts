@@ -15,11 +15,18 @@ export class MessageRepository {
     limit: number
   ): Promise<MessageEntity[]> {
     return await this.repository.find({
-      where: {
-        sender: senderId,
-        receiver: receiverId,
-      },
+      where: [
+        {
+          sender: senderId,
+          receiver: receiverId,
+        },
+        {
+          sender: receiverId,
+          receiver: senderId,
+        },
+      ],
       take: limit,
+      order: { dtRecieved: "DESC" },
     });
   }
 }
