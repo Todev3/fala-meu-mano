@@ -25,7 +25,8 @@ import { createMessage, persistMessage } from "./service/MessageService";
 import { IIncomeMessage } from "./interface/Message";
 import { HistoryRequest } from "./interface/History";
 
-export const app = Express();
+const app = Express();
+
 app.use(Express.static("public"));
 
 const server = http.createServer(app);

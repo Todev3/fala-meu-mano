@@ -7,6 +7,7 @@
   "scripts": {
     "start": "ts-node-dev src/app.ts",
     "dev": "docker compose -f ./docker-compose.yml up --build",
+    "build": "tsc",
     "run:dev": "ts-node-dev --inspect=0.0.0.0:9229 src/app.ts"
   },
   "devDependencies": {
