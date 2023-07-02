@@ -1,6 +1,6 @@
 import http from "http";
 import { Socket, Server as SocketServer } from "socket.io";
-import { memoryMsg } from "./data/memoryDb";
+import { bufferMemoryDb as memoryMsg } from "./data/BufferMemoryDb";
 import { sessionMemoryDb as onlineUsers } from "./data/SessionMemoryDb";
 import {
   addMsgToBuffer,

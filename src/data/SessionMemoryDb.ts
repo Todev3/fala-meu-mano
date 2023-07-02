@@ -1,7 +1,7 @@
 import { IOnlineUser } from "../interface/OnlineUser";
-import { SessionDb } from "../interface/SessionDb";
+import { SessionDbInterface } from "../interface/SessionDb";
 
-export class SessionMemoryDb implements SessionDb {
+export class SessionMemoryDb implements SessionDbInterface {
   private readonly db: Map<number, IOnlineUser>;
 
   constructor() {

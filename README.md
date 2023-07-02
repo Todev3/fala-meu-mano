@@ -37,7 +37,8 @@ Response:
     } []
 
 msg: utilizado para receber as mensagens direcionadas ao seu usuario
-Request: 
+
+Response: 
 
         {
             senderId: number,
@@ -61,7 +62,9 @@ Response:
             msg: string
             date: string
         } []
-        
+
 error: utilizado para receber erros do servidor de acordo com as ações do usario
+
+Reponse:
 
         string[]

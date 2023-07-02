@@ -1,14 +1,15 @@
 import { Server } from "socket.io";
 import { IOutcomeMessage } from "../interface/Message";
 import { IOnlineUser, IOnlineUserDTO } from "../interface/OnlineUser";
+import { BufferDbInterface } from "../interface/BufferDb";
 
 export const sendMsgBuffer = (
   io: Server,
   user: IOnlineUser,
-  memoryMsg: Map<number, IOutcomeMessage[]>
+  memoryMsg: BufferDbInterface
 ): boolean => {
   const msgBuffer = memoryMsg.get(user.id);
-  const size = msgBuffer?.length;
+  const size = msgBuffer.length;
 
   if (!user.online || !size) return false;
 
@@ -74,9 +75,7 @@ export const createOutcomeMessage = (
 export const addMsgToBuffer = (
   receiverId: number,
   out: IOutcomeMessage,
-  memoryMsg: Map<number, IOutcomeMessage[]>
+  memoryMsg: BufferDbInterface
 ): void => {
-  const buffer = memoryMsg.get(receiverId) ?? [];
-
-  memoryMsg.set(receiverId, [...buffer, out]);
+  memoryMsg.set(receiverId, out);
 };
