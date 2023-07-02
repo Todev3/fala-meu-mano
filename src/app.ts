@@ -93,7 +93,11 @@ io.on("connection", async (socket: Socket) => {
     );
 
     const outcomeMessages = messages.map((message) => {
-      return createOutcomeMessage(user.id, message.data, message.dtRecieved);
+      return createOutcomeMessage(
+        message.sender,
+        message.data,
+        message.dtRecieved
+      );
     });
 
     emitHistoryEventBySocketId(io, socketId, outcomeMessages);
