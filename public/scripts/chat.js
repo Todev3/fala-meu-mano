@@ -93,7 +93,6 @@ socket.emit("history", JSON.stringify({
 }));
 
 socket.on("history", (data) => {
-  console.log(data)
   data.reverse().forEach(({ senderId, msg, date }) => {
     setMessageHTML(senderId, msg, date);
   });
@@ -120,8 +119,10 @@ function notifyMessage(data = []) {
     }
 
     document.title = `(${notification}) · Mensagens`;
-    soundNotify.volume = 0.8;
-    soundNotify.play();
+    if(document.hidden) {
+      soundNotify.volume = 0.8;
+      soundNotify.play();
+    }
 
     setTimeout(() => {
       document.title = title;
