@@ -24,6 +24,7 @@ import { messageRepository } from "./repository/MessageRepository";
 import { createMessage, persistMessage } from "./service/MessageService";
 import { IIncomeMessage } from "./interface/Message";
 import { HistoryRequest } from "./interface/History";
+import { APP_PORT } from "./setting";
 
 const app = Express();
 
@@ -114,6 +115,6 @@ startConnection()
     console.log("Error on start connection", error);
   });
 
-server.listen(3000, "0.0.0.0", () => {
-  console.log("listening on -> 3000");
+server.listen(APP_PORT, "0.0.0.0", () => {
+  console.log(`listening on -> ${APP_PORT}`);
 });
