@@ -9,7 +9,7 @@ import {
   sendMsgBuffer,
   emitErrorEventBySocketId,
   emitHistoryEventBySocketId,
-} from "./service/eventService";
+} from "./service/EventService";
 import Express from "express";
 import { startConnection } from "./typeorm";
 import { userRepository } from "./repository/UserRepository";
@@ -18,10 +18,10 @@ import {
   disconnectUser,
   getOnlineUsersDTO,
   initOnlineUsers,
-} from "./service/onlineUserService";
-import { getOrCreateUser } from "./service/userService";
+} from "./service/OnlineUserService";
+import { getOrCreateUser } from "./service/UserService";
 import { messageRepository } from "./repository/MessageRepository";
-import { createMessage, persistMessage } from "./service/messageService";
+import { createMessage, persistMessage } from "./service/MessageService";
 import { IIncomeMessage } from "./interface/Message";
 import { HistoryRequest } from "./interface/History";
 
