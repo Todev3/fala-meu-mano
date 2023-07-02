@@ -10,6 +10,17 @@ body  {
     color: #fff;
 }
 
+body::-webkit-scrollbar {
+    appearance: none;
+    width: 4px;
+    height: 4px;
+}
+
+body::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #6d6b80;
+}
+
 #sidebar.active {
     transition: 0.3s ease-in-out;
     transform: translateX(0) !important;
@@ -29,6 +40,44 @@ body  {
     z-index: 9999;
 }
 
+.message {
+    min-width: 120px;
+    width: max-content;
+    max-width: 90%;
+    transition: 0.08s linear;
+    padding: 14px 20px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.message span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff8;
+    display: block;
+}
+
+.message p {
+    font-size: 16px;
+    white-space: normal;
+    text-align: justify;
+}
+
+.message.right {
+    background-color: #6d28d9;
+    align-self: flex-end;
+    float: right;
+    text-align: end;
+}
+
+.message.left {
+    float: left;
+    align-self: flex-start;
+    background-color: #1e1f26;
+    color: #d6d6e2;
+}
+
+
 .scroll-hidden::-webkit-scrollbar {
     appearance: none;
     -moz-appearance: none;
@@ -44,7 +93,10 @@ body  {
     position: relative;
 }
 [data-notify]::after {
-    content: "1";
+    content: "";
+    box-sizing: content-box;
+    padding: 2px;
+    content: attr(data-notify);
     width: 18px;
     height: 18px;
     display: flex;
@@ -57,4 +109,10 @@ body  {
     position: absolute;
     right: 8px;
     z-index: 1;
+}
+
+@media screen and (min-width: 1200px) {
+    .message {
+        min-width: 300px;
+    }
 }
