@@ -20,13 +20,8 @@ export class MessageRepository {
           sender: senderId,
           receiver: receiverId,
         },
-        {
-          sender: receiverId,
-          receiver: senderId,
-        },
       ],
       take: limit,
-      order: { dtRecieved: "DESC" },
     });
   }
 }

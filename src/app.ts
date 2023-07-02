@@ -21,7 +21,11 @@ import {
 } from "./service/OnlineUserService";
 import { getOrCreateUser } from "./service/UserService";
 import { messageRepository } from "./repository/MessageRepository";
-import { createMessage, persistMessage } from "./service/MessageService";
+import {
+  createMessage,
+  getMessageHistory,
+  persistMessage,
+} from "./service/MessageService";
 import { IIncomeMessage } from "./interface/Message";
 import { HistoryRequest } from "./interface/History";
 import { APP_PORT } from "./setting";
@@ -88,9 +92,10 @@ io.on("connection", async (socket: Socket) => {
   socket.on("history", async (data: string) => {
     const { receiverId, size } = JSON.parse(data) as HistoryRequest;
 
-    const messages = await messageRepository.findBySenderAndReceiver(
+    const messages = await getMessageHistory(
       user.id,
       receiverId,
+      messageRepository,
       size ?? 50
     );
 
