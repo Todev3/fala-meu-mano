@@ -88,7 +88,7 @@ socket.on("users", (data) => {
 });
 
 socket.emit("history", JSON.stringify({
-  senderId: receiver,
+  receiverId: receiver,
   size: 60,
 }));
 
