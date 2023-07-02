@@ -80,14 +80,23 @@ socket.on("msg", (data) => {
 socket.on("users", (data) => {
   divUsers.innerHTML = "";
   data.forEach(({ id, name, online }) =>{
-    if (name === username) {
-      localStorage.setItem('userid', id);
-      return;
+    if (name !== username) { 
+      setButtonLinkUser(id, name, online);
     }
-
-    setButtonLinkUser(id, name, online);
   });
 
+});
+
+socket.emit("history", JSON.stringify({
+  senderId: receiver,
+  size: 60,
+}));
+
+socket.on("history", (data) => {
+  console.log(data)
+  data.reverse().forEach(({ senderId, msg, date }) => {
+    setMessageHTML(senderId, msg, date);
+  });
 });
 
 // UTILS
