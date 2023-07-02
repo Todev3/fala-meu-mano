@@ -1,6 +1,5 @@
 import http from "http";
 import { Socket, Server as SocketServer } from "socket.io";
-import { IIncomeMessage } from "./interface/interfaces";
 import { memoryMsg } from "./data/memoryDb";
 import { sessionMemoryDb as onlineUsers } from "./data/SessionMemoryDb";
 import {
@@ -9,6 +8,7 @@ import {
   emitUsersEvent,
   sendMsgBuffer,
   emitErrorEventBySocketId,
+  emitHistoryEventBySocketId,
 } from "./service/eventService";
 import Express from "express";
 import { startConnection } from "./typeorm";
@@ -22,9 +22,11 @@ import {
 import { getOrCreateUser } from "./service/userService";
 import { messageRepository } from "./repository/MessageRepository";
 import { createMessage, persistMessage } from "./service/messageService";
+import { IIncomeMessage } from "./interface/Message";
+import { HistoryRequest } from "./interface/History";
 
 export const app = Express();
-app.use(Express.static('public'));
+app.use(Express.static("public"));
 
 const server = http.createServer(app);
 const io = new SocketServer(server);
@@ -52,21 +54,21 @@ io.on("connection", async (socket: Socket) => {
 
   socket.on("message", async (data: string) => {
     try {
-      const { receiver, msg } = JSON.parse(data) as IIncomeMessage;
+      const { receiverId, msg } = JSON.parse(data) as IIncomeMessage;
 
-      const onlineReceiver = onlineUsers.get(receiver);
+      const onlineReceiver = onlineUsers.get(receiverId);
 
       if (!onlineReceiver) {
-        emitErrorEventBySocketId(io, socketId, `User ${receiver} not found`);
+        emitErrorEventBySocketId(io, socketId, `User ${receiverId} not found`);
         return;
       }
 
       const message = createMessage(user.id, onlineReceiver.id, msg);
-      const out = createOutcomeMessage(user.name, msg, message.dtRecieved);
+      const out = createOutcomeMessage(user.id, msg, message.dtRecieved);
 
       await persistMessage(message, messageRepository);
 
-      addMsgToBuffer(receiver, out, memoryMsg);
+      addMsgToBuffer(receiverId, out, memoryMsg);
       sendMsgBuffer(io, onlineReceiver, memoryMsg);
     } catch (error: any) {
       emitErrorEventBySocketId(io, socketId, error.message);
@@ -79,6 +81,22 @@ io.on("connection", async (socket: Socket) => {
     emitUsersEvent(io, getOnlineUsersDTO(onlineUsers.toArray()));
 
     console.log("Disconnect ->", socketId);
+  });
+
+  socket.on("history", async (data: string) => {
+    const { receiverId, size } = JSON.parse(data) as HistoryRequest;
+
+    const messages = await messageRepository.findBySenderAndReceiver(
+      user.id,
+      receiverId,
+      size ?? 50
+    );
+
+    const outcomeMessages = messages.map((message) => {
+      return createOutcomeMessage(user.id, message.data, message.dtRecieved);
+    });
+
+    emitHistoryEventBySocketId(io, socketId, outcomeMessages);
   });
 });
 

@@ -8,6 +8,20 @@ export class MessageRepository {
   public async save(model: MessageEntity): Promise<MessageEntity> {
     return await this.repository.save(model);
   }
+
+  public async findBySenderAndReceiver(
+    senderId: number,
+    receiverId: number,
+    limit: number
+  ): Promise<MessageEntity[]> {
+    return await this.repository.find({
+      where: {
+        sender: senderId,
+        receiver: receiverId,
+      },
+      take: limit,
+    });
+  }
 }
 
 export const messageRepository = new MessageRepository(

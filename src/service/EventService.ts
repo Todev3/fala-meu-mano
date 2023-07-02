@@ -1,13 +1,13 @@
 import { Server } from "socket.io";
-import { IOutcomeMessage } from "../interface/interfaces";
-import { IOnlineUser, IOnlineUserDTO } from "../interface/OnlineUserInterface";
+import { IOutcomeMessage } from "../interface/Message";
+import { IOnlineUser, IOnlineUserDTO } from "../interface/OnlineUser";
 
 export const sendMsgBuffer = (
   io: Server,
   user: IOnlineUser,
-  memoryMsg: Map<string, IOutcomeMessage[]>
+  memoryMsg: Map<number, IOutcomeMessage[]>
 ): boolean => {
-  const msgBuffer = memoryMsg.get(user.name);
+  const msgBuffer = memoryMsg.get(user.id);
   const size = msgBuffer?.length;
 
   if (!user.online || !size) return false;
@@ -34,6 +34,14 @@ export const emitErrorEventBySocketId = (
   emitEventBySocketId<string>(io, socketId, "error", [erro]);
 };
 
+export const emitHistoryEventBySocketId = (
+  io: Server,
+  socketId: string,
+  messages: IOutcomeMessage[]
+): void => {
+  emitEventBySocketId<IOutcomeMessage>(io, socketId, "history", messages);
+};
+
 export const emitUsersEvent = (io: Server, users: IOnlineUserDTO[]): void => {
   emitEvent<IOnlineUserDTO>(io, "users", users);
 };
@@ -52,23 +60,23 @@ export const emitEvent = <T>(io: Server, event: string, data: T[]): void => {
 };
 
 export const createOutcomeMessage = (
-  sender: string,
+  senderId: number,
   msg: string,
   date: Date
 ): IOutcomeMessage => {
   return {
-    sender,
+    senderId,
     msg,
     date,
   };
 };
 
 export const addMsgToBuffer = (
-  receiver: string,
+  receiverId: number,
   out: IOutcomeMessage,
-  memoryMsg: Map<string, IOutcomeMessage[]>
+  memoryMsg: Map<number, IOutcomeMessage[]>
 ): void => {
-  const buffer = memoryMsg.get(receiver) ?? [];
+  const buffer = memoryMsg.get(receiverId) ?? [];
 
-  memoryMsg.set(receiver, [...buffer, out]);
+  memoryMsg.set(receiverId, [...buffer, out]);
 };

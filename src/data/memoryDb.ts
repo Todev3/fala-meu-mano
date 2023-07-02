@@ -1,3 +1,3 @@
-import { IOutcomeMessage } from "../interface/interfaces";
+import { IOutcomeMessage } from "../interface/Message";
 
-export const memoryMsg = new Map<string, IOutcomeMessage[]>();
+export const memoryMsg = new Map<number, IOutcomeMessage[]>();

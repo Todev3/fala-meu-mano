@@ -1,10 +1,10 @@
 export interface IIncomeMessage {
-  receiver: string;
+  receiverId: number;
   msg: string;
 }
 
 export interface IOutcomeMessage {
-  sender: string;
+  senderId: number;
   msg: string;
   date: Date;
 }

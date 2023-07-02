@@ -1,5 +1,5 @@
 import { UserEntity } from "../entity/UserEntity";
-import { IOnlineUser, IOnlineUserDTO } from "../interface/OnlineUserInterface";
+import { IOnlineUser, IOnlineUserDTO } from "../interface/OnlineUser";
 import { SessionDb } from "../interface/SessionDb";
 
 export const initOnlineUsers = (
@@ -7,7 +7,7 @@ export const initOnlineUsers = (
   onlineUsers: SessionDb
 ): void => {
   users.forEach((user) => {
-    onlineUsers.set(user.name, {
+    onlineUsers.set(user.id, {
       id: user.id,
       name: user.name,
       online: false,
@@ -21,7 +21,7 @@ export const disconnectUser = (
   user: UserEntity,
   onlineUsers: SessionDb
 ): void => {
-  const onlineUser = onlineUsers.get(user.name);
+  const onlineUser = onlineUsers.get(user.id);
 
   if (!onlineUser) return;
 
@@ -43,20 +43,20 @@ export const connectUser = (
     online: true,
   };
 
-  onlineUsers.set(user.name, onlineUser);
+  onlineUsers.set(user.id, onlineUser);
 
   return onlineUser;
 };
 
 export const getOnlineUsersDTO = (
-  onlineUser: Array<[string, IOnlineUser]>
+  onlineUser: Array<[number, IOnlineUser]>
 ): IOnlineUserDTO[] => {
   return onlineUser.map(([key, value]) => {
     return {
-      name: key,
+      id: key,
+      name: value.name,
       online: value.online,
       lastLogin: value.lastLogin,
-      socketId: "",
     };
   });
 };

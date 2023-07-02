@@ -1,7 +1,7 @@
-import { IOnlineUser } from "./OnlineUserInterface";
+import { IOnlineUser } from "./OnlineUser";
 
 export interface SessionDb {
-  get: (key: string) => IOnlineUser | undefined;
-  set: (key: string, user: IOnlineUser) => void;
-  toArray: () => Array<[string, IOnlineUser]>;
+  get: (key: number) => IOnlineUser | undefined;
+  set: (key: number, user: IOnlineUser) => void;
+  toArray: () => Array<[number, IOnlineUser]>;
 }

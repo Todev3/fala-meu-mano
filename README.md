@@ -19,12 +19,16 @@ Projeto com finalidade de ser um chat em tempo real.
 
 message (evento defualt socket.io): utilizado para enviar mensagens para o um usuario existente no sistema
 
+Request:
+
     {
-        receiver: string,
+        receiverId: number,
         msg: string
     }
 
 users: utilizado para receber a lista de usuarios conectados no sistema
+
+Response:
 
     { 
         name: string, 
@@ -33,13 +37,31 @@ users: utilizado para receber a lista de usuarios conectados no sistema
     } []
 
 msg: utilizado para receber as mensagens direcionadas ao seu usuario
-    
+Request: 
+
         {
-            sender: string,
+            senderId: number,
             msg: string
             date: string
         }
 
+history: utilizado para receber o historico de mensagens trocadas com um usuario
+
+Request:
+
+        {
+            senderId: number,
+            size: number
+        } []
+
+Response: 
+
+        {
+            senderId: number,
+            msg: string
+            date: string
+        } []
+        
 error: utilizado para receber erros do servidor de acordo com as ações do usario
 
         string[]

@@ -1,22 +1,22 @@
-import { IOnlineUser } from "../interface/OnlineUserInterface";
+import { IOnlineUser } from "../interface/OnlineUser";
 import { SessionDb } from "../interface/SessionDb";
 
 export class SessionMemoryDb implements SessionDb {
-  private readonly db: Map<string, IOnlineUser>;
+  private readonly db: Map<number, IOnlineUser>;
 
   constructor() {
-    this.db = new Map<string, IOnlineUser>();
+    this.db = new Map<number, IOnlineUser>();
   }
 
-  public get(key: string): IOnlineUser | undefined {
+  public get(key: number): IOnlineUser | undefined {
     return this.db.get(key);
   }
 
-  public set(key: string, user: IOnlineUser): void {
+  public set(key: number, user: IOnlineUser): void {
     this.db.set(key, user);
   }
 
-  public toArray(): Array<[string, IOnlineUser]> {
+  public toArray(): Array<[number, IOnlineUser]> {
     return [...this.db];
   }
 }
