@@ -2,7 +2,7 @@ import { DataSource } from "typeorm";
 
 export const dataSource = new DataSource({
   type: "sqlite",
-  database: "./database/db.sqlite",
+  database: "./db.sqlite",
   synchronize: true,
   logging: true,
   entities: ["src/entity/**/*.ts", "src/entity/**/*.js"],
