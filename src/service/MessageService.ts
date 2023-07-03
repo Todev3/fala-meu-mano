@@ -29,15 +29,19 @@ export const getMessageHistory = async (
   Repository: MessageRepository,
   size: number = 50
 ): Promise<MessageEntity[]> => {
-  const messages = await Repository.findBySenderAndReceiver(
+  const sendedMessages = await Repository.findBySenderAndReceiver(
     senderId,
     receiverId,
     size
   );
 
-  const allMessages = messages.concat(
-    await Repository.findBySenderAndReceiver(receiverId, senderId, size)
+  const receivedMessages = await Repository.findBySenderAndReceiver(
+    receiverId,
+    senderId,
+    size
   );
+
+  const allMessages = sendedMessages.concat(receivedMessages);
 
   allMessages.sort((a: MessageEntity, b: MessageEntity) => {
     return b.dtRecieved.getTime() - a.dtRecieved.getTime();
