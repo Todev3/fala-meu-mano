@@ -41,7 +41,7 @@ io.on("connection", async (socket: Socket) => {
   const userName = socket.handshake.headers.id ?? "default";
   const socketId = socket.id;
 
-  console.log("Connect id ->", socketId, userName);
+  console.log("Connect id  ->", socketId, userName);
 
   if (Array.isArray(userName)) {
     emitErrorEventBySocketId(
