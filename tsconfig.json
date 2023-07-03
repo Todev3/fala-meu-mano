@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    //"module": "CommonJS",
     "target": "ES2021",
     "allowJs": true,
     "noImplicitAny": true,
