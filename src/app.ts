@@ -25,6 +25,12 @@ import { createMessage, persistMessage } from "./service/MessageService";
 import { IIncomeMessage } from "./interface/Message";
 import { HistoryRequest } from "./interface/History";
 import { APP_PORT } from "./setting";
+import winston from "winston";
+
+const logger = winston.createLogger({
+  format: winston.format.simple(),
+  transports: [new winston.transports.Console()],
+});
 
 const app = Express();
 
@@ -37,8 +43,6 @@ io.on("connection", async (socket: Socket) => {
   const userName = socket.handshake.headers.id ?? "default";
   const socketId = socket.id;
 
-  console.log("Connect id ->", socketId, userName);
-
   if (Array.isArray(userName)) {
     emitErrorEventBySocketId(
       io,
@@ -47,6 +51,8 @@ io.on("connection", async (socket: Socket) => {
     );
     return;
   }
+
+  logger.info(`Connect id -> ${socketId} <> ${userName}`);
 
   const user = await getOrCreateUser(userName, userRepository);
   const onlineUser = connectUser(user, socketId, onlineUsers);
@@ -82,7 +88,7 @@ io.on("connection", async (socket: Socket) => {
 
     emitUsersEvent(io, getOnlineUsersDTO(onlineUsers.toArray()));
 
-    console.log("Disconnect ->", socketId);
+    logger.info("Disconnect ->", socketId);
   });
 
   socket.on("history", async (data: string) => {
@@ -108,7 +114,7 @@ io.on("connection", async (socket: Socket) => {
 
 startConnection()
   .then(async () => {
-    console.log("Database connected");
+    logger.info("Database connected");
 
     const allUsers = await userRepository.findAll();
     initOnlineUsers(allUsers, onlineUsers);
@@ -116,9 +122,9 @@ startConnection()
     return null;
   })
   .catch((error: any) => {
-    console.log("Error on start connection", error);
+    logger.error("Error on start connection", error);
   });
 
 server.listen(APP_PORT, "0.0.0.0", () => {
-  console.log(`listening on -> ${APP_PORT}`);
+  logger.info(`Server Listening on -> ${APP_PORT}`);
 });
