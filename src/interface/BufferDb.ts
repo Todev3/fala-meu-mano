@@ -1,4 +1,4 @@
-import { IOutcomeMessage } from "./Message";
+import { type IOutcomeMessage } from "./Message";
 
 export interface BufferDbInterface {
   get: (key: number) => IOutcomeMessage[];

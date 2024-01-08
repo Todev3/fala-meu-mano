@@ -1,5 +1,5 @@
-import { IOnlineUser } from "../interface/OnlineUser";
-import { SessionDbInterface } from "../interface/SessionDb";
+import { type IOnlineUser } from "../interface/OnlineUser";
+import { type SessionDbInterface } from "../interface/SessionDb";
 
 export class SessionMemoryDb implements SessionDbInterface {
   private readonly db: Map<number, IOnlineUser>;

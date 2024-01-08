@@ -1,5 +1,5 @@
-import { BufferDbInterface } from "../interface/BufferDb";
-import { IOutcomeMessage } from "../interface/Message";
+import { type BufferDbInterface } from "../interface/BufferDb";
+import { type IOutcomeMessage } from "../interface/Message";
 
 export class BufferMemoryDb implements BufferDbInterface {
   private readonly db: Map<number, IOutcomeMessage[]>;

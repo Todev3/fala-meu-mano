@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { type Repository } from "typeorm";
 import { UserEntity } from "../entity/UserEntity";
 import { getDataSource } from "../typeorm";
 
@@ -19,5 +19,5 @@ export class UserRepository {
 }
 
 export const userRepository = new UserRepository(
-  getDataSource().getRepository(UserEntity)
+  getDataSource().getRepository(UserEntity),
 );

@@ -1,9 +1,9 @@
 import { MessageEntity } from "../entity/MessageEntity";
-import { MessageRepository } from "../repository/MessageRepository";
+import { type MessageRepository } from "../repository/MessageRepository";
 
 export const persistMessage = async (
   message: MessageEntity,
-  repository: MessageRepository
+  repository: MessageRepository,
 ): Promise<void> => {
   await repository.save(message);
 };
@@ -11,7 +11,7 @@ export const persistMessage = async (
 export const createMessage = (
   sender: number,
   receiver: number,
-  msg: string
+  msg: string,
 ): MessageEntity => {
   const message = new MessageEntity();
 
@@ -27,18 +27,18 @@ export const getMessageHistory = async (
   senderId: number,
   receiverId: number,
   Repository: MessageRepository,
-  size: number = 50
+  size: number = 50,
 ): Promise<MessageEntity[]> => {
   const sendedMessages = await Repository.findBySenderAndReceiver(
     senderId,
     receiverId,
-    size
+    size,
   );
 
   const receivedMessages = await Repository.findBySenderAndReceiver(
     receiverId,
     senderId,
-    size
+    size,
   );
 
   const allMessages = sendedMessages.concat(receivedMessages);

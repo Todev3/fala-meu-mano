@@ -1,4 +1,4 @@
-import { IOnlineUser } from "./OnlineUser";
+import { type IOnlineUser } from "./OnlineUser";
 
 export interface SessionDbInterface {
   get: (key: number) => IOnlineUser | undefined;

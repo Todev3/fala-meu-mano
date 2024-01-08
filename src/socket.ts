@@ -1,5 +1,5 @@
-import { Socket, Server as SocketServer } from "socket.io";
-import { IIncomeMessage } from "./interface/Message";
+import { type Socket, Server as SocketServer } from "socket.io";
+import { type IIncomeMessage } from "./interface/Message";
 import {
   addMsgToBuffer,
   createOutcomeMessage,
@@ -19,28 +19,26 @@ import {
   getOnlineUsersDTO,
 } from "./service/OnlineUserService";
 import { getOrCreateUser } from "./service/UserService";
-import { HistoryRequest } from "./interface/History";
+import { type HistoryRequest } from "./interface/History";
 import { messageRepository } from "./repository/MessageRepository";
-import { Server } from "http";
+import { type Server } from "http";
 import { logger } from "./logger";
 import { userRepository } from "./repository/UserRepository";
 import { sessionMemoryDb } from "./data/SessionMemoryDb";
 import { bufferMemoryDb } from "./data/BufferMemoryDb";
 
-let io: SocketServer;
-
 export const connectSocket = (server: Server): void => {
-  io = new SocketServer(server);
+  const socketServer = new SocketServer(server);
 
-  io.on("connection", async (socket: Socket) => {
+  socketServer.on("connection", async (socket: Socket) => {
     const userName = socket.handshake.headers.id ?? "default";
     const socketId = socket.id;
 
     if (Array.isArray(userName)) {
       emitErrorEventBySocketId(
-        io,
+        socketServer,
         socketId,
-        `id is not valid -> ${JSON.stringify(userName)}`
+        `id is not valid -> ${JSON.stringify(userName)}`,
       );
       return;
     }
@@ -50,8 +48,8 @@ export const connectSocket = (server: Server): void => {
     const user = await getOrCreateUser(userName, userRepository);
     const onlineUser = connectUser(user, socketId, sessionMemoryDb);
 
-    emitUsersEvent(io, getOnlineUsersDTO(sessionMemoryDb.toArray()));
-    sendMsgBuffer(io, onlineUser, bufferMemoryDb);
+    emitUsersEvent(socketServer, getOnlineUsersDTO(sessionMemoryDb.toArray()));
+    sendMsgBuffer(socketServer, onlineUser, bufferMemoryDb);
 
     socket.on("message", async (data: string) => {
       try {
@@ -61,9 +59,9 @@ export const connectSocket = (server: Server): void => {
 
         if (!onlineReceiver) {
           emitErrorEventBySocketId(
-            io,
+            socketServer,
             socketId,
-            `User ${receiverId} not found`
+            `User ${receiverId} not found`,
           );
           return;
         }
@@ -74,16 +72,19 @@ export const connectSocket = (server: Server): void => {
         await persistMessage(message, messageRepository);
 
         addMsgToBuffer(receiverId, out, bufferMemoryDb);
-        sendMsgBuffer(io, onlineReceiver, bufferMemoryDb);
+        sendMsgBuffer(socketServer, onlineReceiver, bufferMemoryDb);
       } catch (error: any) {
-        emitErrorEventBySocketId(io, socketId, error.message);
+        emitErrorEventBySocketId(socketServer, socketId, error.message);
       }
     });
 
     socket.on("disconnect", () => {
       disconnectUser(user, sessionMemoryDb);
 
-      emitUsersEvent(io, getOnlineUsersDTO(sessionMemoryDb.toArray()));
+      emitUsersEvent(
+        socketServer,
+        getOnlineUsersDTO(sessionMemoryDb.toArray()),
+      );
 
       logger.info("Disconnect ->", socketId);
     });
@@ -95,18 +96,18 @@ export const connectSocket = (server: Server): void => {
         user.id,
         receiverId,
         messageRepository,
-        size ?? 50
+        size ?? 50,
       );
 
       const outcomeMessages = messages.map((message) => {
         return createOutcomeMessage(
           message.sender,
           message.data,
-          message.dtRecieved
+          message.dtRecieved,
         );
       });
 
-      emitHistoryEventBySocketId(io, socketId, outcomeMessages);
+      emitHistoryEventBySocketId(socketServer, socketId, outcomeMessages);
     });
   });
 };

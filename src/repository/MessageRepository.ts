@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { type Repository } from "typeorm";
 import { getDataSource } from "../typeorm";
 import { MessageEntity } from "../entity/MessageEntity";
 
@@ -12,7 +12,7 @@ export class MessageRepository {
   public async findBySenderAndReceiver(
     senderId: number,
     receiverId: number,
-    limit: number
+    limit: number,
   ): Promise<MessageEntity[]> {
     return await this.repository.find({
       where: [
@@ -27,5 +27,5 @@ export class MessageRepository {
 }
 
 export const messageRepository = new MessageRepository(
-  getDataSource().getRepository(MessageEntity)
+  getDataSource().getRepository(MessageEntity),
 );

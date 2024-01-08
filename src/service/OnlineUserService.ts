@@ -1,10 +1,10 @@
-import { UserEntity } from "../entity/UserEntity";
-import { IOnlineUser, IOnlineUserDTO } from "../interface/OnlineUser";
-import { SessionDbInterface } from "../interface/SessionDb";
+import { type UserEntity } from "../entity/UserEntity";
+import { type IOnlineUser, type IOnlineUserDTO } from "../interface/OnlineUser";
+import { type SessionDbInterface } from "../interface/SessionDb";
 
 export const initOnlineUsers = (
   users: UserEntity[],
-  onlineUsers: SessionDbInterface
+  onlineUsers: SessionDbInterface,
 ): void => {
   users.forEach((user) => {
     onlineUsers.set(user.id, {
@@ -19,7 +19,7 @@ export const initOnlineUsers = (
 
 export const disconnectUser = (
   user: UserEntity,
-  onlineUsers: SessionDbInterface
+  onlineUsers: SessionDbInterface,
 ): void => {
   const onlineUser = onlineUsers.get(user.id);
 
@@ -33,7 +33,7 @@ export const disconnectUser = (
 export const connectUser = (
   user: UserEntity,
   socketId: string,
-  onlineUsers: SessionDbInterface
+  onlineUsers: SessionDbInterface,
 ): IOnlineUser => {
   const onlineUser: IOnlineUser = {
     id: user.id,
@@ -49,7 +49,7 @@ export const connectUser = (
 };
 
 export const getOnlineUsersDTO = (
-  onlineUser: Array<[number, IOnlineUser]>
+  onlineUser: Array<[number, IOnlineUser]>,
 ): IOnlineUserDTO[] => {
   return onlineUser.map(([key, value]) => {
     return {

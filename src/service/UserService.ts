@@ -1,9 +1,9 @@
 import { UserEntity } from "../entity/UserEntity";
-import { UserRepository } from "../repository/UserRepository";
+import { type UserRepository } from "../repository/UserRepository";
 
 export const getOrCreateUser = async (
   userName: string,
-  repository: UserRepository
+  repository: UserRepository,
 ): Promise<UserEntity> => {
   const user = await repository.findByName(userName);
 
