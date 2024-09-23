@@ -6,6 +6,6 @@ export class UserEntity {
   id: number;
 
   @Unique(["name"])
-  @Column("name")
+  @Column({ name: "name" })
   name: string;
 }
