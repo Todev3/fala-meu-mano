@@ -1,7 +1,10 @@
 import { test, describe, expect } from "vitest";
-import { initOnlineUsers } from "../../src/service/OnlineUserService";
+import {
+  disconnectUser,
+  initOnlineUsers,
+} from "../../src/service/OnlineUserService";
 import { SessionMemoryDb } from "../../src/data/SessionMemoryDb";
-import { type UserEntity } from "../../src/entity/UserEntity";
+import { UserEntity } from "../../src/entity/UserEntity";
 
 const USER_1_ID = 1;
 
@@ -67,5 +70,28 @@ describe("Test initOnlineUsers", () => {
     initOnlineUsers(currentUsersInDB, sessionMemoryDB);
 
     expect(expectedSessionMemoryDB).toEqual(sessionMemoryDB);
+  });
+});
+
+describe("Test disconnectUser", () => {
+  test("when user is not in onlineUsers, then return null", async () => {
+    const sessionMemoryDB = new SessionMemoryDb();
+    const onlineUser = new UserEntity();
+
+    const temp = disconnectUser(onlineUser, sessionMemoryDB);
+
+    expect(null).toEqual(temp);
+  });
+
+  test("when user is in onlineUsers, then return user with online is false", async () => {
+    const sessionMemoryDB = new SessionMemoryDb();
+    const onlineUser = new UserEntity();
+
+    sessionMemoryDB.set(USER_1_ID, SESSION_MEMORY_DB_1);
+    onlineUser.id = USER_1_ID;
+
+    const disconectedUser = disconnectUser(onlineUser, sessionMemoryDB);
+
+    expect(false).toEqual(disconectedUser?.online);
   });
 });

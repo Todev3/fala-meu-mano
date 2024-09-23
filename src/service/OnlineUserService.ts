@@ -20,14 +20,16 @@ export const initOnlineUsers = (
 export const disconnectUser = (
   user: UserEntity,
   onlineUsers: SessionDbInterface,
-): void => {
+): IOnlineUser | null => {
   const onlineUser = onlineUsers.get(user.id);
 
-  if (!onlineUser) return;
+  if (!onlineUser) return null;
 
   onlineUser.online = false;
   onlineUser.lastLogin = new Date();
   onlineUser.socketId = "";
+
+  return onlineUser;
 };
 
 export const connectUser = (
